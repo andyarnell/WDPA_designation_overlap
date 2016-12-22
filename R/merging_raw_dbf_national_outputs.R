@@ -8,10 +8,10 @@ library(rgdal)
 library(foreach)
 
 #rm(list=ls())
+"C:\Data/wdpa_desig/scratch/national_dt_erase/land/precise_int_dbfs/"
 
-
-in.folder<-("C:/Data/wdpa_desig/scratch/national/precise_int_dbfs") #precise_reshape_dbfs_sr")
-out.folder<-("C:/Data/wdpa_desig/scratch/national/output_fcs/merged")
+in.folder<-("C:/Data/wdpa_desig/scratch/national_dt_erase/land/precise_int_dbfs") 
+out.folder<-("C:/Data/wdpa_desig/scratch/national_dt_erase/land/output_fcs/merged")
 
 setwd(in.folder)
 
