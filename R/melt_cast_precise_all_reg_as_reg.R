@@ -51,7 +51,8 @@ tmp<-unique(tmp[c("GID","DESIG_ENG","DESIG_TYPE","ISO3batch","GEOandUNEP","AREA_
 summary(tmp$DESIG_ENG)
 tmp$DESIG_ENG<-as.character(tmp$DESIG_ENG)
 tmp$DESIG_ENG <- ifelse(tmp$DESIG_TYPE=="National","National",tmp$DESIG_ENG)
-tmp$DESIG_ENG <- ifelse(tmp$DESIG_TYPE=="Regional","National",tmp$DESIG_ENG)
+#tmp$DESIG_ENG <- ifelse(tmp$DESIG_TYPE=="Regional","National",tmp$DESIG_ENG)
+tmp$DESIG_ENG <- ifelse(tmp$DESIG_TYPE=="Regional","Regional",tmp$DESIG_ENG)
 tmp$DESIG_ENG<-as.factor(tmp$DESIG_ENG)
 
 reshapedTypeAll<-dcast(tmp,GID+GEOandUNEP+ISO3batch+INSIDE_X+INSIDE_Y+AREA_GEO~DESIG_ENG,value.var="count",sum)
@@ -69,13 +70,9 @@ round2 = function(x, n) {
 
 
 
-# (head(round(tmp$INSIDE_X,10)))
-# x=tmp$INSIDE_X#round2(tmp$INSIDE_X,3)
-# tail(formatC(x, format="f", digits=8))
-
 names(reshapedTypeAll)
 tmp$DESIG_ENG
-#reshapedTypeAll
+head(reshapedTypeAll)
 head(reshapedTypeAll[,7:(length(names(reshapedTypeAll)))])
 #sum across rows for total count of desig
 reshapedTypeAll$countSum <- rowSums(reshapedTypeAll[,7:(length(names(reshapedTypeAll)))])
@@ -87,17 +84,23 @@ subset(reshapedTypeAll,reshapedTypeAll$countSum==0)
 #create a column for merging/joining datasets
 reshapedTypeAll$xy<-paste0(round(reshapedTypeAll$INSIDE_X,5),"_",round(reshapedTypeAll$INSIDE_Y,5))
 
+
 head(reshapedTypeAll)
 names(reshapedTypeAll)
 
 unique(reshapedTypeAll["xy"])
 
 fileTypeAll<-"reshapedTypeAll.csv"
-names(reshapedTypeAll)
-names(reshapedTypeAll[c(4,5,6,11,12)])
-#saving to csv for joining to shapes
-write.csv(reshapedTypeAll[c(4,5,6,11,12)],fileTypeAll,na="0",row.names=FALSE)
 
+names(reshapedTypeAll)
+#names(reshapedTypeAll[c(4,5,6,11,12)])
+names(reshapedTypeAll[c(4,5,6,12,13)])
+
+
+#saving to csv for joining to shapes
+#write.csv(reshapedTypeAll[c(4,5,6,11,12)],fileTypeAll,na="0",row.names=FALSE)
+
+write.csv(reshapedTypeAll[c(4,5,6,12,13)],fileTypeAll,na="0",row.names=FALSE)
 
 
 
@@ -105,6 +108,7 @@ write.csv(reshapedTypeAll[c(4,5,6,11,12)],fileTypeAll,na="0",row.names=FALSE)
 reshapedTypeAllSR<-subset(reshapedTypeAll,reshapedTypeAll$AREA_GEO>= 0.001)
 
 fileTypeAllSR<-"reshapedTypeAllSR_reg_as_nat.csv"
+fileTypeAllSR<-"reshapedTypeAllSR_reg_as_reg.csv"
 head(reshapedTypeAllSR)
 
 #saving to csv for joining to shapes
@@ -112,9 +116,6 @@ write.csv(reshapedTypeAllSR,fileTypeAllSR,na="0",row.names=FALSE)
 
 
 #subset(reshapedTypeAllSR,reshapedTypeAllSR$ISO3=="FRA")
-
-
-
 
 head(reshapedTypeAllSR)
 
@@ -134,6 +135,7 @@ head(reshapedTypeAllSR)
 
 
 #if (length(reshapedTypeAllSR$GID)>1){
+
 # reshapedTypeAllSR_AGG<-aggregate(reshapedTypeAllSR[c(6)],by=list(reshapedTypeAllSR$"GEOandUNEP", reshapedTypeAllSR$"ISO3",reshapedTypeAllSR$"Baltic Sea Protected Area (HELCOM)",reshapedTypeAllSR$"National",reshapedTypeAllSR$"Ramsar Site, Wetland of International Importance",                  
 #                                                                  reshapedTypeAllSR$"Site of Community Importance (Habitats Directive)",reshapedTypeAllSR$"Special Protection Area (Birds Directive)",                                   
 #                                                                  reshapedTypeAllSR$"Specially Protected Area (Cartagena Convention)",reshapedTypeAllSR$"Specially Protected Areas of Mediterranean Importance (Barcelona Convention)",reshapedTypeAllSR$"UNESCO-MAB Biosphere Reserve",reshapedTypeAllSR$"World Heritage Site"
@@ -144,8 +146,8 @@ head(reshapedTypeAllSR)
 #reshapedTypeAllSR_AGG<-aggregate(reshapedTypeAllSR[c(6)],by=list(reshapedTypeAllSR$"GEOandUNEP", reshapedTypeAllSR$"ISO3",reshapedTypeAllSR$"National",reshapedTypeAllSR$"Ramsar Site, Wetland of International Importance",                  
 #                                                                 reshapedTypeAllSR$"Site of Community Importance (Habitats Directive)",reshapedTypeAllSR$"Special Protection Area (Birds Directive)", reshapedTypeAllSR$"UNESCO-MAB Biosphere Reserve",reshapedTypeAllSR$"World Heritage Site"
 #                                                                 ,reshapedTypeAllSR$"other_regional"),FUN=sum)
-
-reshapedTypeAllSR_AGG<-aggregate(reshapedTypeAllSR[c(6)],by=list(reshapedTypeAllSR$"GEOandUNEP", reshapedTypeAllSR$"ISO3",reshapedTypeAllSR$"National",reshapedTypeAllSR$"Ramsar Site, Wetland of International Importance",
+names(reshapedTypeAllSR)
+reshapedTypeAllSR_AGG<-aggregate(reshapedTypeAllSR[c(6)],by=list(reshapedTypeAllSR$"GEOandUNEP", reshapedTypeAllSR$"ISO3",reshapedTypeAllSR$"National",reshapedTypeAllSR$"Ramsar Site, Wetland of International Importance",reshapedTypeAllSR$"Regional",
                                                                  reshapedTypeAllSR$"UNESCO-MAB Biosphere Reserve",reshapedTypeAllSR$"World Heritage Site"),FUN=sum)
 
 
@@ -155,7 +157,8 @@ dfLength<-(length(names(reshapedTypeAllSR)))
 names(reshapedTypeAllSR_AGG)<-c(names(reshapedTypeAllSR[c(2,3)]), names(reshapedTypeAllSR[7:(dfLength-2)]),names(reshapedTypeAllSR[6]))
 head(reshapedTypeAllSR_AGG)
 
-fileTypeAllSR_AGG<-"reshapedTypeAllSR_AGG_reg_as_nat.csv"
+#fileTypeAllSR_AGG<-"reshapedTypeAllSR_AGG_reg_as_nat.csv"
+fileTypeAllSR_AGG<-"reshapedTypeAllSR_AGG_reg_as_reg.csv"
 
 write.csv(reshapedTypeAllSR_AGG,fileTypeAllSR_AGG,na="0",row.names=FALSE)
 

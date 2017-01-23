@@ -1,0 +1,12 @@
+import arcpy, os
+
+arcpy.env.workspace = r'C:\Data\wdpa_desig\scratch\national_dt_erase\marine\precise_temp_fcs\temp.gdb'
+
+fcs = arcpy.ListFeatureClasses(wild_card='*_uniq_*')
+print fcs
+
+mergeOutput = r"C:\Data\wdpa_desig\scratch\national_dt_erase\marine\output_fcs\merged_fcs.gdb\merged_fcs"
+#sortOutput = r"W:\S&P\s&p techs\Emily\TownshipsDissolved\FinalDissolved.gdb\OSRS_ORN_NER_new"
+
+arcpy.Merge_management(fcs, mergeOutput)
+#arcpy.Sort_management(mergeOutput, sortOutput, [["HWY_NUM_PR", "ASCENDING"]])
