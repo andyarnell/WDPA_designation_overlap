@@ -11,20 +11,30 @@ arcpy.CheckOutExtension("Spatial")
 env.overwriteOutput = True
 
 beginTime = time.clock()
-##comment out dependiong on land or marine regions
+####comment out dependiong on land or marine regions
+wkspce1=r"C:\Data\wdpa_desig\raw\wdpa_desig_inputs_postdec2016.gdb"
+wkspce2=r"C:\Data\wdpa_desig\scratch\both_scales_dt_erase\marine\textfiles"
+wkspce4=r"C:\Data\wdpa_desig\scratch\both_scales_dt_erase\marine\featureclasses"
+wkspce5=r"C:\Data\wdpa_desig\scratch\both_scales_dt_erase\marine\admin_boundaries"
 
 ##wkspce1=r"C:\Data\wdpa_desig\raw\wdpa_desig_inputs_postdec2016.gdb"
-##wkspce2=r"C:\Data\wdpa_desig\scratch\national_dt_erase\land\precise_int_dbfs"
-##wkspce3=r"C:\Data\wdpa_desig\scratch\national_dt_erase\land\fnets\fnets.gdb"
-##wkspce4=r"C:\Data\wdpa_desig\scratch\national_dt_erase\land\precise_temp_fcs\temp.gdb"
-##wkspce5=r"C:\Data\wdpa_desig\scratch\national_dt_erase\land\admin"
+##wkspce2=r"C:\Data\wdpa_desig\scratch\both_scales_dt_erase\land\textfiles"
+##wkspce4=r"C:\Data\wdpa_desig\scratch\both_scales_dt_erase\land\featureclasses"
+##wkspce5=r"C:\Data\wdpa_desig\scratch\both_scales_dt_erase\land\admin_boundaries"
 
-wkspce1=r"C:\Data\wdpa_desig\raw\wdpa_desig_inputs_postdec2016.gdb"
-wkspce2=r"C:\Data\wdpa_desig\scratch\national_dt_erase\marine\precise_int_dbfs"
-wkspce3=r"C:\Data\wdpa_desig\scratch\national_dt_erase\marine\fnets\fnets.gdb"
-wkspce4=r"C:\Data\wdpa_desig\scratch\national_dt_erase\marine\precise_temp_fcs\temp.gdb"
-wkspce5=r"C:\Data\wdpa_desig\scratch\national_dt_erase\marine\admin"
+arcpy.env.workspace = wkspce4
 
+fcs = 'fcs.gdb'
+
+if not arcpy.Exists(fcs):
+    arcpy.CreateFileGDB_management(wkspce4, fcs)
+    print "fcs FileGDB created"
+else:
+    print "fcs gdb exists"
+
+wkspce4=wkspce4+"/"+fcs
+
+print wkspce4
 
 #choose if land or marine (type True for land or False for marine)
 land=False
@@ -33,20 +43,34 @@ land=False
 ####featureClass = r"C:\Users\marined\Desktop\OVERLAP_APR2016\OVERLAP_1km.gdb\Fishnet_1km_clip_to_Land_Moll" ## path to feature class
 #inFC_zone="Fishnet_1km_clip_to_Land_Moll"
 #inFC_main="WDPA_DTmarineAndterrestrial_erase"
-inFC_main="WDPApoly_all_PPR2016_Mollweide_with_tbry_fixed_copy"
-#inFC_iso3="EEZv8_WVS7_Dis_copy_Land_without_DT_Mollweide"
-#inFC_iso3="EEZv8_WVS7_Dis_copy_EEZ_ABNJ_without_DT_Mollweide"
+
+# for national
+#inFC_main="WDPApoly_all_PPR2016_Mollweide_with_tbry_fixed_copy"
+
+# for regional
+inFC_main="WDPApoly_all_PPR2016_Mollweide_with_tbry_fixed_unepregion"
+
+# for national
 inFC_iso3="eezv8_v7_raw_mol_no_dt"
-#fieldList = arcpy.ListFields(inFC_zone) ### simply pointer to location
+
+#for regional
+#inFC_iso3="eezv8_v7_raw_mol_no_dt_diss_region"
+
 
 ##change to field name of iso3 for the different layers
+# for national
 fldsMain = ("ISO3")
 fldsZone = ("ISO3_edt")
+
+#for regional
+#fldsMain = ("GEOandUNEP")
+#fldsZone = ("GEOandUNEP")
 
 ##prefix for output filename
 prefix="country"
 prefix2="fnet"
 prefix3="fnetwdpa"
+
 #where to start iterating through - default should be 0
 startNum = 0
 
@@ -70,11 +94,7 @@ del cur
 listVals=list(set(listVals))
 print "list vals: " + str(listVals)
 
-arcpy.env.workspace = wkspce3
-#listVals2=[]
 
-#listVals2=arcpy.ListFeatureClasses(wild_card='fnet_*')
-#print "list vals2: " + str(listVals2)
 arcpy.env.workspace = wkspce1
 
 ##listValsTemp=[]
@@ -126,7 +146,7 @@ i = startNum
 #############################################################################
 ###list to run seperateley for those that seem to crash due to their size
 #listExcept=['BRA','CAN','CHN','AUS']#missed out - 'USA' 'RUS' 'IND'- rerun!!!!
-listExcept=['RUS','IND','BRA','USA','CAN','AUS','DEU','FRA','CHL','SXM','CIV','GRL']
+#listExcept=['RUS','IND','BRA','USA','CAN','AUS','DEU','FRA','CHL','SXM','CIV','GRL']
 listExcept=[]
 
 #removing those on exception list from list of those to run
@@ -135,34 +155,47 @@ listValsBth = list(set(listValsBth) - set(listExcept))
 #listValsBth=listExcept
 
 print listValsBth
+listValsBth.sort()
 print "listValsBth: " + str(len(listValsBth))
 
 ################################################################################
 inMem = True #temp
 
-for val in listValsBth[startNum:1]:
+#[u'Europe', u'Polar', u'West Asia', u'ABNJ', u'Asia + Pacific', u'Africa', u'Latin America + Caribbean', u'North America']
+#listValsBth=['Polar', 'Asia + Pacific', 'Africa', 'Latin America + Caribbean']
+#listValsBth = ['GBR' , 'DEU', 'DNK', 'ESP']
+print listValsBth
+
+in_memory_feature = "in_memory\\"+ str(i)
+arcpy.MakeFeatureLayer_management(inFC_main, in_memory_feature)
+
+for val in listValsBth[startNum:]:
         beginTime1 = time.clock()
         i += 1
         env.workspace = wkspce1 ## path to feature class
-        val='GBR'
+        #val='Latin America + Caribbean'##uncomment to run on a specific value (ISO3/region). To stop looping change [startNum:] to [startNum:1].
+        #val="GBR"
         print "\nLoop counter: "+ str(i)
-        in_memory_feature = "in_memory\\"+ str(i)
-        selectString=""" {0} = '{1}' """.format(fldsMain,(val))
-        print "Selection string:" +selectString
+        #in_memory_feature = "in_memory\\"+ str(i)
+        #selectString=""" {0} = '{1}' """.format(fldsMain,(val))
+        #print "Selection string:" +selectString
         print "Selecting PAs using iso3 code"
-        arcpy.MakeFeatureLayer_management(inFC_main, in_memory_feature,selectString)
+        #arcpy.MakeFeatureLayer_management(inFC_main, in_memory_feature)
         result0 = arcpy.GetCount_management(in_memory_feature)
         count0 = int(result0.getOutput(0))
         print "Number of rows selected: " +str(count0)
         in_memory_feature2 = "in_memory\\"+ str(i)+"2"
         if land:
             selectString=""" {0} = '{1}' AND type = 'Land'""".format(fldsZone,(val))
+            #selectString="""type = 'Land'"""
         else:
             selectString=""" {0} = '{1}' AND (type = 'EEZ' or type = 'ABNJ')""".format(fldsZone,(val))
+            #selectString="""type = 'EEZ' or type = 'ABNJ'"""
         print "Selecting admin outline using iso3 - currently land only"
         print "Selection string:" +selectString
-        #valClean=arcpy.ValidateTableName(val)
-        valClean=val
+        valClean=arcpy.ValidateTableName(val)
+        val=valClean
+        #valClean=val
         outFC = wkspce5+"/"+prefix+"_"+str(valClean)+".shp"
         arcpy.Select_analysis(inFC_iso3,outFC,selectString)
         arcpy.MakeFeatureLayer_management(inFC_iso3, in_memory_feature2,selectString)
@@ -218,24 +251,40 @@ for val in listValsBth[startNum:1]:
             print "union between wdpa and grid"
             arcpy.Union_analysis(in_features= inMemIntFC,out_feature_class=inMemIntUnionFC,join_attributes="ALL",cluster_tolerance="#",gaps="GAPS")
             print("Elapsed time (minutes): " + str((time.clock() - beginTime1)/60))
+            #splitting to singlepart so that slithers can be removed more effectively as areas are for smallest part
+            inMemIntUnionFCsinglepart=("in_memory\\inmem"+ str(i)+"6")
+            try:
+                arcpy.MultipartToSinglepart_management(inMemIntUnionFC,inMemIntUnionFCsinglepart)
+                inMemIntUnionFC=inMemIntUnionFCsinglepart
+            except:        
+                print "repairing geometry due to errors"
+                arcpy.RepairGeometry_management (inMemIntUnionFC)
+                #arcpy.MultipartToSinglepart_management(inMemIntUnionFC,inMemIntUnionFCsinglepart)
+            #recoding so that code afterwards doesn't need changing
+            #del(inMemIntUnionFCsinglepart)
             print "adding geodesic area column for filtering out small polygons later"
             arcpy.AddGeometryAttributes_management (inMemIntUnionFC, "AREA_GEODESIC", Area_Unit="SQUARE_KILOMETERS")
             print "adding centroid column for aggregating by in r code"
             arcpy.AddGeometryAttributes_management (inMemIntUnionFC, "CENTROID_INSIDE")            
+            arcpy.AddField_management(inMemIntUnionFC,"xy_join","TEXT",field_length="30")
+        
+            arcpy.CalculateField_management(in_table=inMemIntUnionFC, field="xy_join", expression="str(round(!INSIDE_X!,0))+'_'+str(round(!INSIDE_Y!,0))", expression_type="PYTHON_9.3", code_block="")
+                
             intUnionFC=val+"_preciseAdminIntUnionFC"
             print("Elapsed time (minutes): " + str((time.clock() - beginTime1)/60))
             print "Saving vector and dbfs for analysis in R"
             arcpy.CopyFeatures_management(inMemIntUnionFC,intUnionFC)
-            ##try:
-            arcpy.TableToTable_conversion(inMemIntUnionFC,wkspce2,intUnionFC+".dbf")
-            ##except:
-            ##    print "Skipping table copying as causing errors"
-            arcpy.DeleteIdentical_management(inMemIntUnionFC, ["GID", "INSIDE_X", "INSIDE_Y", "AREA_GEO"])
+            try:
+                arcpy.TableToTable_conversion(inMemIntUnionFC,wkspce2,intUnionFC+".csv")
+                #arcpy.ConvertTableToCsvFile_roads (in_table, out_csv_file, {in_delimiter})
+            except:
+                print "Skipping table copying as causing errors"
+            arcpy.DeleteIdentical_management(inMemIntUnionFC, ["INSIDE_X", "INSIDE_Y","AREA_GEO"])
             print "removing identical features using centroid and area fields - allows joins at later date"
             intUnionUniqFC=val+"_preciseAdminIntUnionUniqFC"
             arcpy.CopyFeatures_management(inMemIntUnionFC,intUnionUniqFC)
-            arcpy.Delete_management(intFC)
-            arcpy.Delete_management(in_memory_feature)
+            #arcpy.Delete_management(intFC)
+            #arcpy.Delete_management(in_memory_feature)
             arcpy.Delete_management(in_memory_feature2)
             del in_memory_feature2
             del result
@@ -246,8 +295,8 @@ for val in listValsBth[startNum:1]:
         else:
             
             print "Skipping intersection as no cells intersect PAs"
-            arcpy.Delete_management(intFC)
-            arcpy.Delete_management(in_memory_feature)
+            #arcpy.Delete_management(intFC)
+            #arcpy.Delete_management(in_memory_feature)
             arcpy.Delete_management(in_memory_feature2)
             del in_memory_feature2
             del result
