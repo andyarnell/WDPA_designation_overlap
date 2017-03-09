@@ -10,21 +10,18 @@ library(foreach)
 #rm(list=ls())
 
 
-#national
-in.folder<-("C:/Data/wdpa_desig/scratch/national_dt_erase/land/precise_int_dbfs") #precise_reshape_dbfs_sr")
-out.folder<-("C:/Data/wdpa_desig/scratch/national_dt_erase/land/output_fcs/merged")
+#both scales
 
-in.folder<-("C:/Data/wdpa_desig/scratch/national_dt_erase/marine/precise_int_dbfs") #precise_reshape_dbfs_sr")
-out.folder<-("C:/Data/wdpa_desig/scratch/national_dt_erase/marine/output_fcs/merged")
+#rm(list=ls())
 
-#regional
-in.folder<-("C:/Data/wdpa_desig/scratch/regional_dt_erase/land/precise_int_dbfs") #precise_reshape_dbfs_sr")
-out.folder<-("C:/Data/wdpa_desig/scratch/regional_dt_erase/land/output_fcs/merged")
+#marine
+in.folder<-("C:/Data/wdpa_desig/scratch/both_scales_dt_erase/marine/textfiles") #precise_reshape_dbfs_sr")
+out.folder<-("C:/Data/wdpa_desig/scratch/both_scales_dt_erase/marine/output_fcs/merged_textfiles/combining_missing_temp")
 
-in.folder<-("C:/Data/wdpa_desig/scratch/regional_dt_erase/marine/precise_int_dbfs") #precise_reshape_dbfs_sr")
-out.folder<-("C:/Data/wdpa_desig/scratch/regional_dt_erase/marine/output_fcs/merged")
+#land
+in.folder<-("C:/Data/wdpa_desig/scratch/both_scales_dt_erase/land/textfiles") #precise_reshape_dbfs_sr")
+out.folder<-("C:/Data/wdpa_desig/scratch/both_scales_dt_erase/land/output_fcs/merged_textfiles/combining_missing_temp")
 
-rm(list=ls())
 
 setwd(in.folder)
 
@@ -40,7 +37,7 @@ file_list<-file_list[lapply(file_list,function(x) length(grep("*.dbf*",x,value=F
 file_list<-file_list[lapply(file_list,function(x) length(grep("*.xml",x,value=FALSE))) == 0]
 file_list<-file_list[lapply(file_list,function(x) length(grep("preciseAdminIntUnionFC*",x,value=FALSE))) == 1]
 
-#file_list<-file_list[lapply(file_list,function(x) length(grep("ATF",x,value=FALSE))) == 1]
+file_list
 
 file1<-file_list[2]
 test<-read.dbf(file1)
@@ -54,9 +51,9 @@ tail(formatC(x, format="f", digits=8))
 
 str(test)
 
-test[,c("WDPAID","DESIG_ENG","DESIG_TYPE")]
+#test[,c("WDPAID","DESIG_ENG","DESIG_TYPE")]
 
-dataset[,c("WDPAID","DESIG_ENG","DESIG_TYPE","ISO3_edt","GEOandUNEP","ISO3_1","GEOandUN_1","AREA_GEO","INSIDE_X","INSIDE_Y")]
+#test[,c("WDPAID","DESIG_ENG","DESIG_TYPE","ISO3_edt","GEOandUNEP","ISO3_1","GEOandUN_1","AREA_GEO","INSIDE_X","INSIDE_Y","xy_join")]
 #setwd("C:/Data/wdpa_desig/raw")
 
 #dataset(merge)
@@ -74,7 +71,7 @@ if (exists("dataset")){
 }
 
 
-str(temp_dataset)
+#str(temp_dataset)
 
 for (file in file_list){
   
@@ -85,14 +82,14 @@ for (file in file_list){
     
     dataset <- read.dbf(file)
     #dataset <- read.csv(file)
-    dataset<-dataset[,c("WDPAID","DESIG_ENG","DESIG_TYPE","ISO3_edt","GEOandUNEP","ISO3_1","GEOandUN_1","AREA_GEO","INSIDE_X","INSIDE_Y")]
+    dataset<-dataset[,c("WDPAID","DESIG_ENG","DESIG_TYPE","ISO3_edt","GEOandUNEP","ISO3_1","GEOandUN_1","AREA_GEO","INSIDE_X","INSIDE_Y","xy_join")]
     
-    #dataset<-dataset[,c("WDPAID","DESIG_ENG","DESIG_TYPE","ISO3_edt","GEOandUNEP","ISO3_1","GEOandUNEP_1","AREA_GEO","INSIDE_X","INSIDE_Y")]
-    #names(dataset)<-c("WDPAID","DESIG_ENG","DESIG_TYPE","ISO3_edt","GEOandUNEP","ISO3_1","GEOandUN_1","AREA_GEO","INSIDE_X","INSIDE_Y")
+    #dataset<-dataset[,c("WDPAID","DESIG_ENG","DESIG_TYPE","ISO3_edt","GEOandUNEP","ISO3_1","GEOandUNEP_1","AREA_GEO","INSIDE_X","INSIDE_Y","xy_join")]
+    #names(dataset)<-c("WDPAID","DESIG_ENG","DESIG_TYPE","ISO3_edt","GEOandUNEP","ISO3_1","GEOandUN_1","AREA_GEO","INSIDE_X","INSIDE_Y","xy_join")
     #dataset[1]<-NULL
     dataset<-subset(dataset,dataset$AREA_GEO>= 0.001)
     #dataset<-merge(dataset,myData,by.x="ISO3_1",by.y="ISO3")
-    #dataset[c("GID","WDPAID","DESIG_ENG","DESIG_TYPE","ISO3_edt",GEOandUNEP","ISO3_1","GEOandUN_1","AREA_GEO","INSIDE_X","INSIDE_Y")]
+    #dataset[c("GID","WDPAID","DESIG_ENG","DESIG_TYPE","ISO3_edt",GEOandUNEP","ISO3_1","GEOandUN_1","AREA_GEO","INSIDE_X","INSIDE_Y","xy_join")]
     names(dataset)
     #if(!dataset$GEOandUNEP=="Europe"){
     #  rm(dataset)
@@ -106,7 +103,7 @@ for (file in file_list){
     #temp_dataset <- read.csv(file)
     temp_dataset <- read.dbf(file)
     
-    temp_dataset<-temp_dataset[,c("WDPAID","DESIG_ENG","DESIG_TYPE","ISO3_edt","GEOandUNEP","ISO3_1","GEOandUN_1","AREA_GEO","INSIDE_X","INSIDE_Y")]
+    temp_dataset<-temp_dataset[,c("WDPAID","DESIG_ENG","DESIG_TYPE","ISO3_edt","GEOandUNEP","ISO3_1","GEOandUN_1","AREA_GEO","INSIDE_X","INSIDE_Y","xy_join")]
     #temp_dataset<-temp_dataset[,c("WDPAID","DESIG_ENG","DESIG_TYPE","ISO3_edt","GEOandUNEP","ISO3_1","GEOandUNEP_1","AREA_GEO","INSIDE_X","INSIDE_Y")]
     #names(temp_dataset)<-c("WDPAID","DESIG_ENG","DESIG_TYPE","ISO3_edt","GEOandUNEP","ISO3_1","GEOandUN_1","AREA_GEO","INSIDE_X","INSIDE_Y")
     #temp_dataset[1]<-NULL
@@ -124,18 +121,6 @@ for (file in file_list){
     
   }
 }
-
-temp_dataset <- read.csv("merged_aggsr_admin.csv")
-#temp_dataset <- read.dbf(file)
-names(temp_dataset)
-temp_dataset<-temp_dataset[,c("WDPAID","DESIG_ENG","DESIG_TYPE","ISO3_edt","GEOandUNEP","ISO3_1","GEOandUN_1","AREA_GEO","INSIDE_X","INSIDE_Y")]
-#temp_dataset<-temp_dataset[,c("WDPAID","DESIG_ENG","DESIG_TYPE","ISO3_edt","GEOandUNEP","ISO3_1","GEOandUNEP_1","AREA_GEO","INSIDE_X","INSIDE_Y")]
-names(temp_dataset)<-c("WDPAID","DESIG_ENG","DESIG_TYPE","ISO3_edt","GEOandUNEP","ISO3_1","GEOandUN_1","AREA_GEO","INSIDE_X","INSIDE_Y")
-#temp_dataset[1]<-NULL
-temp_dataset<-subset(temp_dataset,temp_dataset$AREA_GEO>= 0.001)
-#temp_dataset<-merge(temp_dataset,myData,by.x="ISO3_1",by.y="ISO3")
-names(temp_dataset) <- names(dataset)
-dataset<-rbind(dataset, temp_dataset)
 
 
 droplevels(dataset)
@@ -173,7 +158,7 @@ str(dataset)
 #colnames(dataset)<-c("int", "reg",	"nat",	"countSum","AREA_GEO","ISO3batch")
 
 
-write.csv(dataset,paste0(out.folder,"/","merged_aggsr_admin1.csv"), na="0",row.names=FALSE )
+write.csv(dataset,paste0(out.folder,"/","merged_aggsr_admin1.csv"), na="0",row.names=FALSE)
 
 #rm(dataset)
 

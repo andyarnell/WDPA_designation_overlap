@@ -10,27 +10,30 @@ library(foreach)
 #rm(list=ls())
 
 
-#national
-in.folder<-("C:/Data/wdpa_desig/scratch/national_dt_erase/land/precise_int_dbfs") #precise_reshape_dbfs_sr")
-out.folder<-("C:/Data/wdpa_desig/scratch/national_dt_erase/land/output_fcs/merged")
-
-
-
-in.folder<-("C:/Data/wdpa_desig/scratch/national_dt_erase/marine/precise_int_dbfs") #precise_reshape_dbfs_sr")
-out.folder<-("C:/Data/wdpa_desig/scratch/national_dt_erase/marine/output_fcs/merged")
-
-#regional
-in.folder<-("C:/Data/wdpa_desig/scratch/regional_dt_erase/land/precise_int_dbfs") #precise_reshape_dbfs_sr")
-out.folder<-("C:/Data/wdpa_desig/scratch/regional_dt_erase/land/output_fcs/merged")
-
-in.folder<-("C:/Data/wdpa_desig/scratch/regional_dt_erase/marine/precise_int_dbfs") #precise_reshape_dbfs_sr")
-out.folder<-("C:/Data/wdpa_desig/scratch/regional_dt_erase/marine/output_fcs/merged")
+# # The input file geodatabase
+# fgdb = in.folder2
+# # List all feature classes in a file geodatabase
+# subset(ogrDrivers(), grepl("GDB", name))
+# fc_list = ogrListLayers(fgdb)
+# print(fc_list)
+# # Read the feature class
+# #fc = readOGR(dsn=fgdb,layer="fnet_AFG")
 
 rm(list=ls())
 
-setwd(in.folder)
 
-out.folder<-("C:/Data/wdpa_desig/scratch/national_dt_erase/land/output_fcs/merged/inbetween")
+#land
+in.folder<-("C:/Data/wdpa_desig/scratch/both_scales_dt_erase/land/output_fcs/merged_textfiles/combining_missing_temp")
+out.folder<-("C:/Data/wdpa_desig/scratch/both_scales_dt_erase/land/output_fcs/merged_textfiles/combining_missing_temp")
+#marine
+in.folder<-("C:/Data/wdpa_desig/scratch/both_scales_dt_erase/marine/output_fcs/merged_textfiles/combining_missing_temp")
+out.folder<-("C:/Data/wdpa_desig/scratch/both_scales_dt_erase/marine/output_fcs/merged_textfiles/combining_missing_temp")
+
+
+
+#setwd(in.folder)
+
+#out.folder<-("C:/Data/wdpa_desig/scratch/national_dt_erase/land/output_fcs/merged/inbetween")
 
 setwd(out.folder)
 file_list <- list.files()
@@ -45,21 +48,16 @@ file_list<-file_list[lapply(file_list,function(x) length(grep("preciseAdminIntUn
 
 #file_list<-file_list[lapply(file_list,function(x) length(grep("ATF",x,value=FALSE))) == 1]
 
-file1<-file_list[2]
-test<-read.dbf(file1)
+#file1<-file_list[2]
+#test<-read.dbf(file1)
 
-#test<-read.csv(file1)
-head(test)
-str(test)
-#(head(round(tmp$INSIDE_X,10)))
-x=test$INSIDE_X#round2(tmp$INSIDE_X,3)
-tail(formatC(x, format="f", digits=8))
 
-str(test)
 
-test[,c("WDPAID","DESIG_ENG","DESIG_TYPE")]
+file_list
 
-dataset[,c("WDPAID","DESIG_ENG","DESIG_TYPE","ISO3_edt","GEOandUNEP","ISO3_1","GEOandUN_1","AREA_GEO","INSIDE_X","INSIDE_Y")]
+#test[,c("WDPAID","DESIG_ENG","DESIG_TYPE")]
+
+#dataset[,c("WDPAID","DESIG_ENG","DESIG_TYPE","ISO3_edt","GEOandUNEP","ISO3_1","GEOandUN_1","AREA_GEO","INSIDE_X","INSIDE_Y","xy_join")]
 #setwd("C:/Data/wdpa_desig/raw")
 
 #dataset(merge)
@@ -89,12 +87,12 @@ for (file in file_list){
     #dataset <- read.dbf(file)
     dataset <- read.csv(file)
     
-    dataset<-dataset[,c("WDPAID","DESIG_ENG","DESIG_TYPE","ISO3_edt","GEOandUNEP","ISO3_1","GEOandUNEP_1","AREA_GEO","INSIDE_X","INSIDE_Y")]
-    names(dataset)<-c("WDPAID","DESIG_ENG","DESIG_TYPE","ISO3_edt","GEOandUNEP","ISO3_1","GEOandUN_1","AREA_GEO","INSIDE_X","INSIDE_Y")
+    dataset<-dataset[,c("WDPAID","DESIG_ENG","DESIG_TYPE","ISO3_edt","GEOandUNEP","ISO3_1","GEOandUNEP_1","AREA_GEO","INSIDE_X","INSIDE_Y","xy_join")]
+    names(dataset)<-c("WDPAID","DESIG_ENG","DESIG_TYPE","ISO3_edt","GEOandUNEP","ISO3_1","GEOandUN_1","AREA_GEO","INSIDE_X","INSIDE_Y","xy_join")
     #dataset[1]<-NULL
     dataset<-subset(dataset,dataset$AREA_GEO>= 0.001)
     #dataset<-merge(dataset,myData,by.x="ISO3_1",by.y="ISO3")
-    #dataset[c("GID","WDPAID","DESIG_ENG","DESIG_TYPE","ISO3_edt",GEOandUNEP","ISO3_1","GEOandUN_1","AREA_GEO","INSIDE_X","INSIDE_Y")]
+    #dataset[c("GID","WDPAID","DESIG_ENG","DESIG_TYPE","ISO3_edt",GEOandUNEP","ISO3_1","GEOandUN_1","AREA_GEO","INSIDE_X","INSIDE_Y","xy_join")]
     names(dataset)
     #if(!dataset$GEOandUNEP=="Europe"){
     #  rm(dataset)
@@ -109,8 +107,8 @@ for (file in file_list){
     #temp_dataset <- read.dbf(file)
     
     #temp_dataset<-temp_dataset[,c("WDPAID","DESIG_ENG","DESIG_TYPE","ISO3_edt","GEOandUNEP","ISO3_1","GEOandUN_1","AREA_GEO","INSIDE_X","INSIDE_Y")]
-    temp_dataset<-temp_dataset[,c("WDPAID","DESIG_ENG","DESIG_TYPE","ISO3_edt","GEOandUNEP","ISO3_1","GEOandUNEP_1","AREA_GEO","INSIDE_X","INSIDE_Y")]
-    names(temp_dataset)<-c("WDPAID","DESIG_ENG","DESIG_TYPE","ISO3_edt","GEOandUNEP","ISO3_1","GEOandUN_1","AREA_GEO","INSIDE_X","INSIDE_Y")
+    temp_dataset<-temp_dataset[,c("WDPAID","DESIG_ENG","DESIG_TYPE","ISO3_edt","GEOandUNEP","ISO3_1","GEOandUNEP_1","AREA_GEO","INSIDE_X","INSIDE_Y","xy_join")]
+    names(temp_dataset)<-c("WDPAID","DESIG_ENG","DESIG_TYPE","ISO3_edt","GEOandUNEP","ISO3_1","GEOandUN_1","AREA_GEO","INSIDE_X","INSIDE_Y","xy_join")
     #temp_dataset[1]<-NULL
     temp_dataset<-subset(temp_dataset,temp_dataset$AREA_GEO>= 0.001)
     #temp_dataset<-merge(temp_dataset,myData,by.x="ISO3_1",by.y="ISO3")
@@ -126,6 +124,7 @@ for (file in file_list){
     
   }
 }
+
 
 droplevels(dataset)
 unique(dataset$ISO3)
@@ -153,6 +152,7 @@ dataset<-rbind(dataset, temp_dataset)
 
 
 str(dataset)
+
 
 
 (head(round(dataset$INSIDE_X,10)))
@@ -183,6 +183,4 @@ write.csv(dataset,paste0(out.folder,"/","merged_aggsr_admin2.csv"), na="0",row.n
 #rm(dataset)
 
 head(dataset)
-
-
 

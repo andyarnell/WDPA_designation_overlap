@@ -2,27 +2,28 @@ import arcpy, os
 
 ####input workspace
 
-arcpy.env.workspace = r'C:\Data\wdpa_desig\scratch\both_scales_dt_erase\land\featureclasses\fcs.gdb'
+#arcpy.env.workspace = r'C:\Data\wdpa_desig\scratch\both_scales_dt_erase\land\featureclasses\fcs.gdb'
 arcpy.env.workspace = r'C:\Data\wdpa_desig\scratch\both_scales_dt_erase\marine\featureclasses\fcs.gdb'
 
 
 arcpy.env.overwriteOutput=True
 
 
-fcs = arcpy.ListFeatureClasses(wild_card='*Uniq*')
+fcs = arcpy.ListFeatureClasses(wild_card='*UnionFC*')
+
 print fcs
 
 ####output workspace
 
 #both scales
 
-mergePath=r"C:\Data\wdpa_desig\scratch\both_scales_dt_erase\land\output_fcs\merged_fcs.gdb"
+#mergePath=r"C:\Data\wdpa_desig\scratch\both_scales_dt_erase\land\output_fcs\merged_fcs.gdb"
 mergePath=r"C:\Data\wdpa_desig\scratch\both_scales_dt_erase\marine\output_fcs\merged_fcs.gdb"
 
 
 
 ###file name for output
-mergeFile= "merged_fcs" 
+mergeFile= "merged_fcs_noon_unique" 
 mergeOutput = mergePath + "/" +mergeFile
 
 print mergeOutput
@@ -46,13 +47,13 @@ arcpy.env.workspace = r'C:\Data\wdpa_desig\scratch\both_scales_dt_erase\land\fea
 
 arcpy.env.overwriteOutput=True
 
+fcs = arcpy.ListFeatureClasses(wild_card='*UnionFC*')
 
-fcs = arcpy.ListFeatureClasses(wild_card='*Uniq*')
 print fcs
 
 ####output workspace
 
-#national
+
 
 mergePath=r"C:\Data\wdpa_desig\scratch\both_scales_dt_erase\land\output_fcs\merged_fcs.gdb"
 #mergePath=r"C:\Data\wdpa_desig\scratch\both_scales_dt_erase\marine\output_fcs\merged_fcs.gdb"
@@ -60,7 +61,7 @@ mergePath=r"C:\Data\wdpa_desig\scratch\both_scales_dt_erase\land\output_fcs\merg
 
 
 ###file name for output
-mergeFile= "merged_fcs" 
+mergeFile= "merged_fcs_non_unique" 
 mergeOutput = mergePath + "/" +mergeFile
 
 print mergeOutput
